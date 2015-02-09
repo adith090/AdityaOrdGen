@@ -1,0 +1,6 @@
+ClearCase CopyAreaDB|4
+OSM_VOB\NEO\src\th\co\dtac\neo\commons\service
+2
+2
+13:ServiceFactory.java|1|135c8e54e8f|aaf|d2f15893|d71f7d543e8e44fbaafc410a2c850114|0
+19:SimpleServiceFactory.java|1|135c8e54eab|56a|e88fb3f4|a55fd64b56d44df69e6ac3a82297f223|0

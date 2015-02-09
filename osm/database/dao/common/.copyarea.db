@@ -1,0 +1,7 @@
+ClearCase CopyAreaDB|4
+OSM_VOB\NEO\src\com\dtac\osm\database\dao\common
+2
+3
+e:CommonDao.java|1|135c74e738b|145|64836f6d|7369f4b483b94e509991645d9a0b6572|0
+12:CommonDaoImpl.java|1|135c74e7548|339|e4900efe|a996663ab6f947529c500c8868841b57|0
+12:OSMDaoManager.java|1|135c8e54a0d|2aa|8662d8c2|70fb64ab9d0946f084e7c3584698fa51|0

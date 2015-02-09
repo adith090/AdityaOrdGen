@@ -1,0 +1,26 @@
+ClearCase CopyAreaDB|4
+OSM_VOB\NEO\src\com\dtac\osm\util
+2
+16
+c:ErrUtil.java|1|13a62c5d9bb|4b2b|7a7cb37a|fab073f2f68942de99cac2955749a907|0
+13:StaxParserUtil.java|1|13956ffd3b5|5da4|117af752|e14ec88bbfcd4807b051f984d6968ffd|0
+d:SOAPUtil.java|1|13956ffd227|1570|8b2e40d|e5cd1f017b284fde975ca7fabd6d9b18|0
+f:XMLAPIUtil.java|1|13a3e80e3c8|11ce0|828e84ef|49b1b9239f2c4ad88558c90032476d29|0
+e:OSMLogger.java|1|1389e40f328|2f7f|b5c22dea|5aacd735755745e4a7b3e36f6088bd3b|0
+11:DateTimeUtil.java|1|13956ffd373|211b|be1d3524|7393da2852cb4b60b5c0fa068f1913a5|0
+d:DateUtil.java|1|135d1785f3a|d09|b15b4cbe|1fd64d8229b94ea69dc748af1aa167e1|0
+f:OSMLovUtil.java|1|138563343eb|723|57d50524|8ff9fe4948bd491ebebc7e1cb49c1992|0
+d:JAXBPool.java|1|136cf81cda9|1940|ab27066c|444e8be419d34bfcabedb235c1f54d25|0
+f:ConfigUtil.java|1|13856334177|703|fbf72981|c1ada8c926ff4f52bcc38b13c3c572e5|0
+13:GenerateNumber.java|1|131e075a7f1|176|62107579|9a7013ede93f4dbc8b87e15dc6127dbf|0
+f:StaxHelper.java|1|13845dd14a9|33f|1ba1141b|da373a60dd114b1aa0f6fbef425da2c5|0
+16:ObjectFactoryUtil.java|1|13956ffd404|5b3|de6ae1d9|b038c542a99e43709918b53a47803948|0
+10:EncryptUtil.java|1|13a3e80e51d|6e5|172fff|ba7109f048084474abd5f2c6019fcbc7|0
+12:XMLParserUtil.java|1|13a3e80e41f|a6ad|eaed2e67|bd437d0166374447b79773115b97fe0c|0
+1d:XMLGregorianCalendarUtil.java|1|13454af7bc4|878|2a7acc06|f3096da2bc764e0dbc8a6f625f7b7299|0
+12:OrderTypeUtil.java|1|131e075a839|551|c017d0c7|864534990f9f437d9b41bd243d273445|0
+16:TransactionIdUtil.java|1|133d8ea861d|448|15634609|712697ae19664add865d37bfd360d3d8|0
+f:CommonUtil.java|1|13856333c48|587|bcddc412|df2ce3703185473d875f55d292c88d10|0
+17:AuthenticationUtil.java|1|1385633363c|985|e3f5dbe5|4fd7af53448b4f2eac66e62a6323c387|0
+13:BEXMLGenerator.java|1|13956ffd1a4|1b54b|440f73ed|e4db28335289436db9132955af8e4a59|0
+17:MiniOrderGenerator.java|1|13845dd141f|2e12|235e6872|a57ceae26e2d473fb51923cf7a4884d2|0
