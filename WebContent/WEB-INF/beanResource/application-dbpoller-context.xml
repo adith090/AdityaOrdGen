@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+		http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc-2.1.xsd">
+
+	<import resource="application-jdbc-context.xml"/>
+	
+	<bean id="propertiesJDBCPollerConfigure" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="file:conf/omordergenerator/sql-poller-config.properties"></property>
+	</bean>
+ 
+ 	<bean id="CRMOrderHeaderTranslator" class="com.m1.sg.bcc.om.message.handler.PollCRMMessageHandler">
+ 		<property name="orderType" value="Order"></property>
+ 	</bean>
+ 	
+ 	<bean id="CRMOrderHeaderOpcoTranslator" class="com.m1.sg.bcc.om.message.handler.PollCRMMessageHandler">
+ 		<property name="orderType" value="Opco"></property>
+ 	</bean>
+ 	
+ 	 <bean id="CRMOrderHeaderTechReqTranslator" class="com.m1.sg.bcc.om.message.handler.PollCRMMessageHandler">
+ 		<property name="orderType" value="TechReq"></property>
+ 	</bean>
+ 	
+ 	<bean id="PollingConfiguation" class="com.m1.sg.bcc.om.database.poller.configuration.OMPollerConfiguration">
+ 	</bean>
+ 	
+ 	<bean id="PollingPeriodConfigurationHighPriority" class="com.m1.sg.bcc.om.database.poller.configuration.OMHighPriorityPollerTriggerConfiguration">
+		<property name="pollerid" value="OMOrderGeneratorHighPriorityPoller"></property>
+	</bean>
+	
+	<bean id="PollingPeriodConfigurationMediumPriority" class="com.m1.sg.bcc.om.database.poller.configuration.OMMediumPriorityPollerTriggerConfiguration">
+		<property name="pollerid" value="OMOrderGeneratorMediumPriorityPoller"></property>
+	</bean>
+	
+	<bean id="PollingPeriodConfigurationLowPriority" class="com.m1.sg.bcc.om.database.poller.configuration.OMLowPriorityPollerTriggerConfiguration">
+		<property name="pollerid" value="OMOrderGeneratorLowPriorityPoller"></property>
+	</bean>
+	<bean id="PollingPeriodOpcoConfiguration" class="com.m1.sg.bcc.om.database.poller.configuration.OMOpcoPollerTriggerConfiguration">
+		<property name="pollerid" value="OMOrderGeneratorOpcoPoller"></property>
+	</bean>
+	<bean id="PollingPeriodTechReqConfiguration" class="com.m1.sg.bcc.om.database.poller.configuration.OMTechReqPollerTriggerConfiguration">
+		<property name="pollerid" value="OMOrderGeneratorTechReqPoller"></property>
+	</bean>
+ 	
+ 	<int:channel id="CRMOrderHeaderHighPriorityChannel"></int:channel>
+ 	<int:channel id="CRMOrderHeaderMediumPriorityChannel"></int:channel>
+ 	<int:channel id="CRMOrderHeaderLowPriorityChannel"></int:channel>
+ 	<int:channel id="CRMOpcoChannel"></int:channel>
+ 	<int:channel id="CRMTechReqChannel"></int:channel> 	  
+	
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="1" />
+		<property name="maxPoolSize" value="5" />
+     	<property name="queueCapacity" value="50" />
+	</bean>
+	
+	<int:service-activator requires-reply="false" method="createCOMCreateOrderMessage" input-channel="CRMOrderHeaderHighPriorityChannel" ref="CRMOrderHeaderTranslator"></int:service-activator>
+	<int:service-activator requires-reply="false" method="createCOMCreateOrderMessage" input-channel="CRMOrderHeaderMediumPriorityChannel" ref="CRMOrderHeaderTranslator"></int:service-activator>
+	<int:service-activator requires-reply="false" method="createCOMCreateOrderMessage" input-channel="CRMOrderHeaderLowPriorityChannel" ref="CRMOrderHeaderTranslator"></int:service-activator>
+ 	<int:service-activator requires-reply="false" method="createCOMCreateOrderMessage" input-channel="CRMOpcoChannel" ref="CRMOrderHeaderOpcoTranslator"></int:service-activator>
+ 	<int:service-activator requires-reply="false" method="createCOMCreateOrderMessage" input-channel="CRMTechReqChannel" ref="CRMOrderHeaderTechReqTranslator"></int:service-activator>
+ 	
+	<int-jdbc:inbound-channel-adapter id="CRMOrderHeaderHighPriorityPoller"
+			channel="CRMOrderHeaderHighPriorityChannel"
+			data-source="CRMCustomDataSource"
+			max-rows-per-poll="#{PollingConfiguation.MaxRowsPerPollHighPriority}"
+			update-per-row="false">
+		<int-jdbc:query>#{PollingConfiguation.SQLQueryHighPriorityPoller}</int-jdbc:query>
+		<int-jdbc:update>#{PollingConfiguation.SQLPostQueryHighPriorityPoller}</int-jdbc:update>
+		<int:poller task-executor="taskExecutor" trigger="PollingPeriodConfigurationHighPriority">
+			<int:transactional isolation="SERIALIZABLE" transaction-manager="CRMTransactionManager"/>
+		</int:poller>
+	</int-jdbc:inbound-channel-adapter>
+	
+	<int-jdbc:inbound-channel-adapter id="CRMOrderHeaderMediumPriorityPoller"
+			channel="CRMOrderHeaderMediumPriorityChannel"
+			data-source="CRMCustomDataSource"
+			max-rows-per-poll="#{PollingConfiguation.MaxRowsPerPollMediumPriority}">
+			<int-jdbc:query>#{PollingConfiguation.SQLQueryMediumPriorityPoller}</int-jdbc:query>
+			<int-jdbc:update>#{PollingConfiguation.SQLPostQueryMediumPriorityPoller}</int-jdbc:update>
+			<int:poller task-executor="taskExecutor" trigger="PollingPeriodConfigurationMediumPriority">
+				<int:transactional isolation="SERIALIZABLE" transaction-manager="CRMTransactionManager"/>
+			</int:poller>
+	</int-jdbc:inbound-channel-adapter>
+	
+	<int-jdbc:inbound-channel-adapter id="CRMOrderHeaderLowPriorityPoller"
+			channel="CRMOrderHeaderLowPriorityChannel"
+			data-source="CRMCustomDataSource"
+			max-rows-per-poll="#{PollingConfiguation.MaxRowsPerPollLowPriority}">
+			<int-jdbc:query>#{PollingConfiguation.SQLQueryLowPriorityPoller}</int-jdbc:query>
+			<int-jdbc:update>#{PollingConfiguation.SQLPostQueryLowPriorityPoller}</int-jdbc:update>
+			<int:poller task-executor="taskExecutor" trigger="PollingPeriodConfigurationLowPriority">
+				<int:transactional isolation="SERIALIZABLE" transaction-manager="CRMTransactionManager"/>
+			</int:poller>
+	</int-jdbc:inbound-channel-adapter>
+	
+	<int-jdbc:inbound-channel-adapter id="CRMOpcoPoller"
+			channel="CRMOpcoChannel"
+			data-source="CRMCustomDataSource"
+			max-rows-per-poll="#{PollingConfiguation.MaxRowsPerPollOpco}">
+			<int-jdbc:query>#{PollingConfiguation.SQLQueryOpcoPoller}</int-jdbc:query>
+			<int-jdbc:update>#{PollingConfiguation.SQLPostQueryOpcoPoller}</int-jdbc:update>
+			<int:poller task-executor="taskExecutor" trigger="PollingPeriodOpcoConfiguration">
+				<int:transactional isolation="SERIALIZABLE" transaction-manager="CRMTransactionManager"/>
+			</int:poller>
+	</int-jdbc:inbound-channel-adapter>
+
+	<int-jdbc:inbound-channel-adapter id="CRMTechReqPoller"
+			channel="CRMTechReqChannel"
+			data-source="CRMCustomDataSource"
+			max-rows-per-poll="#{PollingConfiguation.MaxRowsPerPollTechReq}">
+			<int-jdbc:query>#{PollingConfiguation.SQLQueryTechReqPoller}</int-jdbc:query>
+			<int-jdbc:update>#{PollingConfiguation.SQLPostQueryTechReqPoller}</int-jdbc:update>
+			<int:poller task-executor="taskExecutor" trigger="PollingPeriodTechReqConfiguration">
+				<int:transactional isolation="SERIALIZABLE" transaction-manager="CRMTransactionManager"/>
+			</int:poller>
+	</int-jdbc:inbound-channel-adapter>
+	
+</beans>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+		http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc-2.1.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd">	
+
+	<bean id="beanFactory" class="com.m1.sg.bcc.om.util.OMBeanFactory"></bean>
+
+	<bean id="CRMTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="CRMCustomDataSource"></property>
+	</bean>
+	
+	<bean id="OMTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="OMCustomDataSource"></property>
+	</bean>
+
+	<bean id="CRMCustomDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="custom/jdbc/crm/om/trans" />
+	</bean>
+	
+	<bean id="OMCustomDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="custom/jdbc/om/osm/trans"></property>
+	</bean>
+	
+	<bean id="OMJDBCDao" class="com.m1.sg.bcc.om.database.dao.OMJDBCDao">
+		<property name="CRMDatasourceTransactionManager" ref="CRMTransactionManager" />
+		<property name="OMDatasourceTransactionManager" ref="OMTransactionManager" />
+	</bean>
+
+</beans>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xmlns:jms="http://www.springframework.org/schema/jms"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.1.xsd
+		http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.1.xsd">
+
+	<bean id="propertiesJMSConfigure" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="file:conf/omordergenerator/jms-config.properties"></property>
+	</bean>
+
+	<bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+		<property name="environment">
+			<props>
+				<prop key="java.naming.factory.initial">${CONNECTION_FACTORY}</prop>
+				<prop key="java.naming.provider.url">${PROVIDER_URL}</prop>
+				<prop key="java.naming.security.principal">${USER_NAME}</prop>
+				<prop key="java.naming.security.credentials">#{credentialLoader.JMSCredential}</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="jmsConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiTemplate" ref="jndiTemplate"></property>
+		<property name="jndiName">
+			<value>${JMS_CONNECTION_FACOTY}</value>
+		</property>
+	</bean>
+	
+	<bean id="jmsDestinationResolver" class="org.springframework.jms.support.destination.JndiDestinationResolver">
+		<property name="jndiTemplate" ref="jndiTemplate"></property>
+		<property name="cache" value="true"></property>
+	</bean>
+	
+	<bean id="jmsQueueTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="jmsConnectionFactory"></property>
+		<property name="destinationResolver" ref="jmsDestinationResolver"></property>
+		<property name="sessionTransacted" value="true"></property>
+	</bean>
+	
+	<bean id="osmResponseMessageListener" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="concurrentConsumers" value="5"></property>
+		<property name="connectionFactory" ref="jmsConnectionFactory"></property>
+		<property name="destinationName" value="oracle/communications/ordermanagement/WebServiceResponseQueue"></property>
+		<property name="messageListener" ref="osmResponseMessageMDBListener"></property>
+		<property name="destinationResolver" ref="jmsDestinationResolver"></property>
+	</bean>
+	
+	<bean id="osmResponseMessageMDBListener" class="com.m1.sg.bcc.om.jms.receiver.OSMResponseMessageReceiver"></bean>
+	<bean id="credentialLoader" class="com.m1.sg.bcc.om.config.OMPollerConfigurationCredential">
+		<property name="passwordEncrypt"><value>${PASS_WORD}</value></property>
+	</bean>
+</beans>
